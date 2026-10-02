@@ -150,6 +150,28 @@ exportD = "d"
         self.assertEqual(d.getVar("exportD"), "d")
         self.assertIsNone(d.getVarFlag("exportD", "export"))
 
+    mixedcase_pn_override = """
+PN = "${@bb.parse.vars_from_file(d.getVar('FILE', False), d)[0]}"
+OVERRIDES = "pn-${PN}"
+RPROVIDES:perl-ExtUtils-MakeMaker = "base"
+RPROVIDES:perl-ExtUtils-MakeMaker:append:pn-ExtUtils-MakeMaker = " text"
+"""
+
+    @unittest.expectedFailure
+    def test_parse_mixedcase_pn_override(self):
+        # Recipes named after CPAN distributions have mixed-case PNs, so
+        # OVERRIDES contains a mixed-case pn-${PN} entry. An operation
+        # guarded by that override must still be applied.
+        with tempfile.TemporaryDirectory() as tempdir:
+            recipe = os.path.join(tempdir, "ExtUtils-MakeMaker.bb")
+            with open(recipe, "w") as f:
+                f.write(self.mixedcase_pn_override)
+            os.chdir(tempdir)
+            d = bb.parse.handle(recipe, self.d)['']
+        self.assertEqual(d.getVar("PN"), "ExtUtils-MakeMaker")
+        self.assertIn("pn-ExtUtils-MakeMaker", d.getVar("OVERRIDES").split(":"))
+        self.assertEqual(d.getVar("RPROVIDES:perl-ExtUtils-MakeMaker"), "base text")
+
     overridetest = """
 RRECOMMENDS:${PN} = "a"
 RRECOMMENDS:${PN}:libc = "b"
