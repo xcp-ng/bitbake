@@ -157,7 +157,6 @@ RPROVIDES:perl-ExtUtils-MakeMaker = "base"
 RPROVIDES:perl-ExtUtils-MakeMaker:append:pn-ExtUtils-MakeMaker = " text"
 """
 
-    @unittest.expectedFailure
     def test_parse_mixedcase_pn_override(self):
         # Recipes named after CPAN distributions have mixed-case PNs, so
         # OVERRIDES contains a mixed-case pn-${PN} entry. An operation
