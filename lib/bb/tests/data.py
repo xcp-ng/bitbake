@@ -416,6 +416,17 @@ class TestOverrides(unittest.TestCase):
         bb.data.expandKeys(self.d)
         self.assertEqual(self.d.getVar("TEST"), "base appended")
 
+    # Test an :append whose override name is lowercase
+    @unittest.expectedFailure
+    def test_append_in_expanded_lowercase_override(self):
+        self.d.setVar("machine", "qemux86")
+        self.d.setVar("PN", "gizmo")
+        self.d.setVar("OVERRIDES", "gizmo:pn-gizmo-qemux86")
+        self.d.setVar("TEST:${PN}", "base")
+        self.d.setVar("TEST:${PN}:append:pn-gizmo-${machine}", " appended")
+        bb.data.expandKeys(self.d)
+        self.assertEqual(self.d.getVar("TEST"), "base appended")
+
     # Test renaming to a key which is itself not expanded yet, as native.bbclass
     # does. The dependent override keys must be left for expandKeys() to rename.
     def test_rename_to_unexpanded_key_with_override(self):
