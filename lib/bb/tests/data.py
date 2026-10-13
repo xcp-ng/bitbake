@@ -417,7 +417,6 @@ class TestOverrides(unittest.TestCase):
         self.assertEqual(self.d.getVar("TEST"), "base appended")
 
     # Test an :append whose override name is lowercase
-    @unittest.expectedFailure
     def test_append_in_expanded_lowercase_override(self):
         self.d.setVar("machine", "qemux86")
         self.d.setVar("PN", "gizmo")
